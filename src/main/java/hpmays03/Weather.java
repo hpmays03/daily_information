@@ -61,4 +61,43 @@ public class Weather extends VBox{
         rainPercentage.setPadding(insets);
         this.setAlignment(Pos.CENTER);
     }
+    private static final String ZIPCODE_API = "https://geocoding-api.open-meteo.com/v1/search";
+    public static String pullLatLong(String location) {
+        try {
+            String count = "10";
+            String language = "en";
+            String format = "json";
+            String query = String.format("?name=%s&count=%s&language=%s&format=%s", location, count, language, format);
+            String uri = ZIPCODE_API + query;
+            URI resource = URI.create(uri);
+            System.out.println(uri);
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(resource).build();
+            BodyHandler<String> bodyHandler = BodyHandlers.ofString();
+            HttpResponse<String> response = HTTP_CLIENT.<String>send(request, bodyHandler);
+            int status = response.statusCode();
+            if (status != 200) {
+                throw new IOException("HTTP " + status);
+            }
+            String body = response.body();
+            LocationResponse m = GSON.<LocationResponse>fromJson(body, LocationResponse.class);
+            if (m.results == null) {
+                Platform.runLater(() -> {
+                    a.setAlertType(AlertType.ERROR);
+                    a.setContentText("URI: " + resource + "\n" + "The zip-code you have entered does not exist.");
+                    a.show();
+            });
+            }
+            ZipCode output = m.results[0];
+            city = output.name;
+            latitude = output.latitude;
+            longitude = output.longitude;
+            state = output.admin1;
+            return city;
+        } catch (IOException | InterruptedException cause) {
+            System.err.println(cause);
+            cause.printStackTrace();
+            return "inside catch";
+        }
+    }
 }
