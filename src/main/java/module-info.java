@@ -1,7 +1,10 @@
 module hpmays03 {
-    requires javafx.controls;
-    requires javafx.fxml;
+    requires transitive java.net.http;
+    requires transitive javafx.controls;
+    requires transitive javafx.fxml;
+    requires transitive javafx.web;
+    requires transitive com.google.gson;
 
-    opens hpmays03 to javafx.fxml;
+    opens hpmays03;
     exports hpmays03;
 }

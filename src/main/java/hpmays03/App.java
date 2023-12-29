@@ -1,9 +1,9 @@
 package hpmays03;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -12,23 +12,26 @@ import java.io.IOException;
  * JavaFX App
  */
 public class App extends Application {
+    Stage stage;
+    Scene scene;
+    VBox root;
 
-    private static Scene scene;
+    public App() {
+        root = new VBox();
+    }
+    public void init() {
+        
+    }
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("primary"), 640, 480);
+        this.stage = stage;
+        scene = new Scene(root, 640, 480);
+        stage.setTitle("daily information");
         stage.setScene(scene);
+        stage.setOnCloseRequest(event -> Platform.exit());
+        stage.sizeToScene();
         stage.show();
-    }
-
-    static void setRoot(String fxml) throws IOException {
-        scene.setRoot(loadFXML(fxml));
-    }
-
-    private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
-        return fxmlLoader.load();
     }
 
     public static void main(String[] args) {
