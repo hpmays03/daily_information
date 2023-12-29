@@ -114,7 +114,6 @@ public class Weather extends VBox{
         String query = String.format("latitude=%s&longitude=%s&daily=%s&temperature_unit=%s&wind_speed_unit=%s&precipitation_unit=%s&forecast_days=%s", latitude, longitude, daily, temperature, windUnit, rainUnit, days);
         String uri = WEATHER_API + query;
         URI resource = URI.create(uri);
-        System.out.println(uri);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(resource).build();
             BodyHandler<String> bodyHandler = BodyHandlers.ofString();
@@ -135,7 +134,6 @@ public class Weather extends VBox{
             dailyWeather output = m.results[0];
             high = output.temperature_2m_max;
             low = output.temperature_2m_min;
-            System.out.println(high + low);
             return true;
         } catch (IOException | InterruptedException cause) {
             System.err.println(cause);
