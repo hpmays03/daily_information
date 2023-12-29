@@ -100,4 +100,34 @@ public class Weather extends VBox{
             return "inside catch";
         }
     }
+
+    private static final String WEATHER_API = "https://api.open-meteo.com/v1/forcast?";
+    public static String pullWeather(String latitude, String longitude) {
+        try{
+        String daily = "temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_probability_max,wind_speed_10m_max";
+        String temperature = "fahrenheit";
+        String windUnit = "mph";
+        String rainUnit = "inch";
+        String days = "1";
+        String query = String.format("latitude=%s&longitude=%s%daily=%s&temperature_unit=%s&wind_speed_unit=%s&precipitation_unit=%s&forecast_days=%s",
+            latitude, longitude, daily, temperature, windUnit, rainUnit, days);
+        String uri = WEATHER_API + query;
+        URI resource = URI.create(uri);
+        System.out.println(uri);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(resource).build();
+            BodyHandler<String> bodyHandler = BodyHandlers.ofString();
+            HttpResponse<String> response = HTTP_CLIENT.<String>send(request, bodyHandler);
+            int status = response.statusCode();
+            if (status != 200) {
+                throw new IOException("HTTP " + status);
+            }
+            String body = response.body();
+            return "working";
+        } catch (IOException | InterruptedException cause) {
+            System.err.println(cause);
+            cause.printStackTrace();
+            return "inside catch";
+        }
+    }
 }
