@@ -101,16 +101,15 @@ public class Weather extends VBox{
         }
     }
 
-    private static final String WEATHER_API = "https://api.open-meteo.com/v1/forcast?";
+    private static final String WEATHER_API = "https://api.open-meteo.com/v1/forecast?";
     public static String pullWeather(String latitude, String longitude) {
         try{
-        String daily = "temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_probability_max,wind_speed_10m_max";
+        String daily = "temperature_2m_max,temperature_2m_min";
         String temperature = "fahrenheit";
         String windUnit = "mph";
         String rainUnit = "inch";
         String days = "1";
-        String query = String.format("latitude=%s&longitude=%s%daily=%s&temperature_unit=%s&wind_speed_unit=%s&precipitation_unit=%s&forecast_days=%s",
-            latitude, longitude, daily, temperature, windUnit, rainUnit, days);
+        String query = String.format("latitude=%s&longitude=%s&daily=%s&temperature_unit=%s&wind_speed_unit=%s&precipitation_unit=%s&forecast_days=%s", latitude, longitude, daily, temperature, windUnit, rainUnit, days);
         String uri = WEATHER_API + query;
         URI resource = URI.create(uri);
         System.out.println(uri);
