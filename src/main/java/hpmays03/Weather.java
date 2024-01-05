@@ -104,7 +104,7 @@ public class Weather extends VBox{
     }
 
     private static final String WEATHER_API = "https://api.open-meteo.com/v1/forecast?";
-    public static boolean pullWeather(String latitude, String longitude) {
+    public static String pullWeather(String latitude, String longitude) {
         try{
         String daily = "temperature_2m_max,temperature_2m_min";
         String temperature = "fahrenheit";
@@ -123,22 +123,12 @@ public class Weather extends VBox{
                 throw new IOException("HTTP " + status);
             }
             String body = response.body();
-            ForecastResponse m = GSON.<ForecastResponse>fromJson(body, ForecastResponse.class);
-            if (m.results == null) {
-                Platform.runLater(() -> {
-                    a.setAlertType(AlertType.ERROR);
-                    a.setContentText("URI: " + resource + "\n" + "The zip-code you have entered does not exist.");
-                    a.show();
-            });
-            }
-            dailyWeather output = m.results[0];
-            high = output.temperature_2m_max;
-            low = output.temperature_2m_min;
-            return true;
+            System.out.println(body);
+            return uri;
         } catch (IOException | InterruptedException cause) {
             System.err.println(cause);
             cause.printStackTrace();
-            return false;
+            return null;
         }
     }
 }
