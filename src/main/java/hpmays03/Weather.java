@@ -136,7 +136,9 @@ public class Weather extends VBox{
         int parse = body.indexOf(daily);
         body = body.substring(parse);
         parse = body.indexOf(searchTerm);
-        body = body.substring(parse);
+        body = body.substring(parse, parse + 25);
+        parse = body.indexOf("[");
+        body = body.substring(parse + 1);
         System.out.println(body);
         return body;
     }
