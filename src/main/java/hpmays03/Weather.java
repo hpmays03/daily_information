@@ -123,6 +123,7 @@ public class Weather extends VBox{
                 throw new IOException("HTTP " + status);
             }
             String body = response.body();
+            System.out.println(body);
             return body;
         } catch (IOException | InterruptedException cause) {
             System.err.println(cause);
@@ -139,7 +140,6 @@ public class Weather extends VBox{
         body = body.substring(parse, parse + 25);
         parse = body.indexOf("[");
         body = body.substring(parse + 1);
-        System.out.println(body);
         return body;
     }
 }
