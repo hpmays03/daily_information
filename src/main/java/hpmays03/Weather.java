@@ -123,12 +123,21 @@ public class Weather extends VBox{
                 throw new IOException("HTTP " + status);
             }
             String body = response.body();
-            System.out.println(body);
-            return uri;
+            return body;
         } catch (IOException | InterruptedException cause) {
             System.err.println(cause);
             cause.printStackTrace();
             return null;
         }
+    }
+    public static String pullInfo(String searchTerm, String daily) {
+        String body = pullWeather(latitude, longitude);
+        daily = daily + "\":";
+        int parse = body.indexOf(daily);
+        body = body.substring(parse);
+        parse = body.indexOf(searchTerm);
+        body = body.substring(parse);
+        System.out.println(body);
+        return body;
     }
 }
