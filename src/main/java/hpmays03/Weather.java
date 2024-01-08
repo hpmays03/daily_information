@@ -111,6 +111,8 @@ public class Weather extends VBox{
         String windUnit = "mph";
         String rainUnit = "inch";
         String days = "1";
+        System.out.println(days);
+        System.out.println(rainUnit);
         String query = String.format("latitude=%s&longitude=%s&daily=%s&temperature_unit=%s&wind_speed_unit=%s&precipitation_unit=%s&forecast_days=%s", latitude, longitude, daily, temperature, windUnit, rainUnit, days);
         String uri = WEATHER_API + query;
         URI resource = URI.create(uri);
