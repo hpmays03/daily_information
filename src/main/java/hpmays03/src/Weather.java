@@ -1,4 +1,4 @@
-package hpmays03;
+package hpmays03.src;
 
 import javafx.scene.layout.VBox;
 import javafx.scene.image.Image;

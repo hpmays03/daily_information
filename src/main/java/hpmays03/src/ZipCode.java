@@ -1,4 +1,4 @@
-package hpmays03;
+package hpmays03.src;
 
 public class ZipCode {
     String name;

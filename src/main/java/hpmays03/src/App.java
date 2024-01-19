@@ -1,4 +1,4 @@
-package hpmays03;
+package hpmays03.src;
 
 import javafx.application.Application;
 import javafx.application.Platform;
