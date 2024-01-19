@@ -20,6 +20,7 @@ public class App extends Application {
     SearchBar searcher;
     VBox compile;
     HBox weatherNews;
+    News news;
 
     public App() {
         root = new HBox();
@@ -27,11 +28,12 @@ public class App extends Application {
         searcher = new SearchBar();
         compile = new VBox();
         weatherNews = new HBox();
+        news = new News();
     }
     public void init() {
         Insets insets = new Insets(10,20,10,20);
         weather.setPadding(insets);
-        weatherNews.getChildren().addAll(weather);
+        weatherNews.getChildren().addAll(weather, news);
         compile.getChildren().addAll(searcher, weatherNews);
         root.getChildren().addAll(compile);
         root.isResizable();
