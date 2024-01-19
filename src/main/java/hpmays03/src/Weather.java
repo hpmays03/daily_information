@@ -27,35 +27,33 @@ public class Weather extends VBox{
     public static Gson GSON = new GsonBuilder()
         .setPrettyPrinting()
         .create();
-    
+
     Image image;
-    static ImageView showImage;
+    static ImageView imageShow;
     static Label location;
     static Label weatherStatus;
     static Label highLow;
     static Label windSpeed;
     static Label rainPercentage;
+    boolean pressed;
     static String city;
     static String longitude;
     static String latitude;
     static String state;
-    static String high;
-    static String low;
     private static Alert a = new Alert(AlertType.NONE);
-
     public Weather() {
         super();
         image = new Image("file:resources/default.png");
-        showImage = new ImageView(image);
-        showImage.setFitHeight(200);
-        showImage.setFitWidth(200);
+        imageShow = new ImageView(image);
+        imageShow.setFitHeight(200);
+        imageShow.setFitWidth(200);
         location =  new Label("None shown since no ZipCode entered");
         weatherStatus = new Label("N/A");
         highLow = new Label("N/A");
         windSpeed = new Label("N/A");
         rainPercentage = new Label("N/A");
         Insets insets = new Insets(10, 0, 10, 0);
-        this.getChildren().addAll(location, showImage, weatherStatus, highLow, windSpeed, rainPercentage);
+        this.getChildren().addAll(location, imageShow, weatherStatus, highLow, windSpeed, rainPercentage);
         location.setPadding(insets);
         weatherStatus.setPadding(insets);
         highLow.setPadding(insets);
@@ -63,6 +61,7 @@ public class Weather extends VBox{
         rainPercentage.setPadding(insets);
         this.setAlignment(Pos.CENTER);
     }
+
     private static final String ZIPCODE_API = "https://geocoding-api.open-meteo.com/v1/search";
     public static String pullLatLong(String location) {
         try {
@@ -103,20 +102,12 @@ public class Weather extends VBox{
         }
     }
 
-    private static final String WEATHER_API = "https://api.open-meteo.com/v1/forecast?";
-    public static String pullWeather(String latitude, String longitude) {
-        try{
-        String daily = "temperature_2m_max,temperature_2m_min";
-        String temperature = "fahrenheit";
-        String windUnit = "mph";
-        String rainUnit = "inch";
-        String days = "1";
-        System.out.println(days);
-        System.out.println(rainUnit);
-        String query = String.format("latitude=%s&longitude=%s&daily=%s&temperature_unit=%s&wind_speed_unit=%s&precipitation_unit=%s&forecast_days=%s", latitude, longitude, daily, temperature, windUnit, rainUnit, days);
-        String uri = WEATHER_API + query;
-        URI resource = URI.create(uri);
-        HttpRequest request = HttpRequest.newBuilder()
+    private static final String GRID_API = "https://api.weather.gov/points/";
+    public static String pullGrid() {
+        try {
+            String uri = GRID_API + latitude + "," + longitude;
+            URI resource = URI.create(uri);
+            HttpRequest request = HttpRequest.newBuilder()
                 .uri(resource).build();
             BodyHandler<String> bodyHandler = BodyHandlers.ofString();
             HttpResponse<String> response = HTTP_CLIENT.<String>send(request, bodyHandler);
@@ -125,23 +116,107 @@ public class Weather extends VBox{
                 throw new IOException("HTTP " + status);
             }
             String body = response.body();
+            int parse = body.indexOf("gridY");
+            String properties = body.substring(parse);
+            parse = properties.indexOf("forecast");
+            properties = properties.substring(parse);
+            int linkEnd = properties.indexOf("\",");
+            properties = properties.substring(12, linkEnd);
+            return properties;
+        } catch (IOException | InterruptedException cause) {
+            System.err.println(cause);
+            cause.printStackTrace();
+            return "error";
+        }
+    }
+
+    public static String pullData(String searchTerm, String time) {
+        try {
+            String uri = pullGrid();
+            URI resource = URI.create(uri);
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(resource).build();
+            BodyHandler<String> bodyHandler = BodyHandlers.ofString();
+            HttpResponse<String> response = HTTP_CLIENT.<String>send(request, bodyHandler);
+            int status = response.statusCode();
+            if (status != 200) {
+                throw new IOException("HTTP " + status);
+            }
+            String body = response.body();
+            int parse = body.indexOf(time);
+            body = body.substring(parse);
+            parse = body.indexOf(searchTerm);
+            body = body.substring(parse);
+            parse = body.indexOf(": ");
+            if (searchTerm == "icon") {
+                int stringEnd = body.indexOf("\",");
+                body = body.substring(parse + 3, stringEnd);
+                return body;
+            } else {
+            int stringEnd = body.indexOf(",");
+            body = body.substring(parse + 2, stringEnd);
+            if (body.contains("\"")) {
+                body = body.substring(1);
+                body = body.substring(0, body.length() - 1);
+            }
+            if (searchTerm.equals("value")) {
+                body = body.substring(0, 4);
+            }
+            return body;
+            }
+        } catch (IOException | InterruptedException cause) {
+            System.err.println(cause);
+            cause.printStackTrace();
+            return "error";
+        }
+    }
+
+    public static String pullDate() {
+        try {
+            String uri = pullGrid();
+            URI resource = URI.create(uri);
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(resource).build();
+            BodyHandler<String> bodyHandler = BodyHandlers.ofString();
+            HttpResponse<String> response = HTTP_CLIENT.<String>send(request, bodyHandler);
+            int status = response.statusCode();
+            if (status != 200) {
+                throw new IOException("HTTP " + status);
+            }
+            String body = response.body();
+            int parse = body.indexOf("updated");
+            body = body.substring(parse);
+            body = body.substring(11, 21);
             System.out.println(body);
             return body;
         } catch (IOException | InterruptedException cause) {
             System.err.println(cause);
             cause.printStackTrace();
-            return null;
+            return "error";
         }
     }
-    public static String pullInfo(String searchTerm, String daily) {
-        String body = pullWeather(latitude, longitude);
-        daily = daily + "\":";
-        int parse = body.indexOf(daily);
-        body = body.substring(parse);
-        parse = body.indexOf(searchTerm);
-        body = body.substring(parse, parse + 25);
-        parse = body.indexOf("[");
-        body = body.substring(parse + 1);
-        return body;
+
+    public static void pullWeather() {
+        String high = pullData("temperature", "number\": 1");
+        String status = pullData("shortForecast", "number\": 1");
+        String wind = pullData("windSpeed", "number\": 1");
+        String windDirection = pullData("windDirection", "number\": 1");
+        String rain = pullData("value", "number\": 1");
+        String low = pullData("temperature", "number\": 2");
+        String icon = pullData("icon", "number\": 1");
+        System.out.println(icon);
+        Platform.runLater(() -> {
+            location.setText(city);
+            weatherStatus.setText(status);
+            highLow.setText(high + "/" + low);
+            windSpeed.setText(wind + " " + windDirection);
+            if (rain.equals("null")) {
+                rainPercentage.setText("0%");
+            } else {
+                rainPercentage.setText(rain + "%");
+            }
+            Image updateImage = new Image(icon);
+            imageShow.setImage(updateImage);
+        });
     }
 }

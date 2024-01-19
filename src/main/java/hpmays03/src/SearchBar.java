@@ -22,9 +22,8 @@ public class SearchBar extends HBox{
         result = searchBar.getText();
         Runnable loadInfo = () -> {
             Weather.pullLatLong(searchBar.getText());
-            Weather.pullWeather(Weather.latitude, Weather.longitude);
-            Weather.pullInfo("temperature_2m_max", "daily");
-            Weather.pullInfo("temperature_2m_min", "daily");
+            Weather.pullGrid();
+            Weather.pullWeather();
         };
         EventHandler<ActionEvent> loadInfoHandler = (event) -> {
             runNow(loadInfo);
