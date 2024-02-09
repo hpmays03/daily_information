@@ -1,6 +1,16 @@
 package hpmays03.src;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandler;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -36,4 +46,33 @@ public class News extends VBox{
         blocks[2] = block3;
         this.getChildren().addAll(blocks[0], blocks[1], blocks[2]);
     }
+    private static String encode(String value) {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8);
+    }
+
+    private static List<String> uniqueTitles = new ArrayList<>();
+    private static final String NEWS_API = "find a news API to use";
+    
+    public static NewsBlock pullNews(int num) {
+        try {
+            //parameters
+            String query = String.format(); //complete the line when found news API
+            String uri = NEWS_API + query;
+            URI resource = URI.create(uri);
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(resource).build();
+            BodyHandler<String> bodyHandler = BodyHandlers.ofString();
+            HttpResponse<String> response = HTTP_CLIENT.<String>send(request, bodyHandler);
+            int status = response.statusCode();
+            if (status != 200) {
+                throw new IOException("HTTP " + status);
+            }
+            String body = response.body();
+        } catch (IOException | InterruptedException cause) {
+            System.err.println(cause);
+            cause.printStackTrace();
+            return null;
+        }
+    }
+
 }
